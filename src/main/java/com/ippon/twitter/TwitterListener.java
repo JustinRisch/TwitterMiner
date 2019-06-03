@@ -51,7 +51,7 @@ public class TwitterListener implements StatusListener {
                 e.printStackTrace();
             }
         } else
-            kc.dropTweet(tweet);
+            kc.publishTweet(tweet);
     }
 
 
