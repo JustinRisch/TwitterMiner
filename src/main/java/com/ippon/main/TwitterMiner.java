@@ -2,6 +2,7 @@ package com.ippon.main;
 
 import com.ippon.resourcemanagers.ResourceLoader;
 import com.ippon.twitter.TwitterListener;
+import com.ippon.twitter.TwitterLookup;
 import twitter4j.FilterQuery;
 import twitter4j.TwitterStream;
 import twitter4j.TwitterStreamFactory;
@@ -22,6 +23,7 @@ public class TwitterMiner {
         s.close();
         TwitterStream t = TwitterStreamFactory.getSingleton();
         List<String> userAuthInfo = ResourceLoader.loadWords("userAuthInfo");
+        TwitterLookup.authenticate("userAuthInfo");
         t.setOAuthConsumer(userAuthInfo.get(0), userAuthInfo.get(1));
         t.setOAuthAccessToken(new AccessToken(userAuthInfo.get(2),
                 userAuthInfo.get(3), Long.parseLong(userAuthInfo.get(4))));

@@ -4,17 +4,15 @@ import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.ippon.resourcemanagers.ResourceLoader;
+import com.ippon.twitter.TwitterLookup;
 import twitter4j.Status;
-import twitter4j.UserMentionEntity;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.LinkedList;
 
 public class TweetPojo implements Serializable {
     private static final long serialVersionUID = 1L;
-    //@JsonProperty("user")
-    // UserPojo user = null;
+
     @JsonProperty("createdAt")
     Date createdAt = null;
 
@@ -26,13 +24,13 @@ public class TweetPojo implements Serializable {
     @JsonProperty("inReplyToUserId")
     long inReplyToUserId = -1;
     @JsonProperty("mentionedUsers")
-    Long[] mentionedUsers = null;
+    UserPojo[] mentionedUsers = null;
     @JsonProperty("language")
     String lang = null;
     @JsonProperty("text")
     String text = null;
 
-    Boolean mayBeNSFW =  false;
+    Boolean mayBeNSFW = false;
 
     public TweetPojo() {
     }
@@ -45,15 +43,17 @@ public class TweetPojo implements Serializable {
         createdAt = s.getCreatedAt();
         id = s.getId();
         inReplyToUserId = s.getInReplyToUserId();
-        LinkedList<Long> temp = new LinkedList<>();
-        for (UserMentionEntity um : s.getUserMentionEntities())
-            temp.add(um.getId());
-        mentionedUsers = temp.toArray(new Long[temp.size()]);
+        long[] ids = new long[s.getUserMentionEntities().length];
+        // converts our UserMentions[] to a long[]
+        for (int i = 0; i < ids.length; i++)
+            ids[i] = s.getUserMentionEntities()[i].getId();
+
+        mentionedUsers = TwitterLookup.getUsers(id);
         lang = s.getLang();
         text = ResourceLoader.sterilizeText(s.getText());
     }
 
-    public boolean mayBeNSFW(){
+    public boolean mayBeNSFW() {
         return mayBeNSFW;
     }
 
@@ -99,12 +99,12 @@ public class TweetPojo implements Serializable {
     }
 
     @JsonGetter("mentionedUsers")
-    public Long[] getMentionedUsers() {
+    public UserPojo[] getMentionedUsers() {
         return mentionedUsers;
     }
 
     @JsonSetter("mentionedUsers")
-    public void setMentionedUsers(Long[] mentionedUsers) {
+    public void setMentionedUsers(UserPojo[] mentionedUsers) {
         this.mentionedUsers = mentionedUsers;
     }
 
